@@ -15,10 +15,10 @@ contract VerifundFactoryTest is Test {
     }
 
     function testCreateCampaign() public {
-        
+
     }
 
     function testAllCampaigns() public {
-
+        
     }
 }

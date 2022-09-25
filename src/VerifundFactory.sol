@@ -13,10 +13,6 @@ contract VerifundFactory is IVerifundFactory {
         _campaigns.push(campaign);
     }
 
-    function allCampaigns(uint256 limit, uint256 offset) external pure returns (Campaign[] memory coll) {
-        return coll;
-    }
-
     function getAllCampaigns() external view returns (Campaign[] memory) {
         return _campaigns;
     }
