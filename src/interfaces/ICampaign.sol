@@ -11,4 +11,5 @@ interface ICampaign {
     function getName() external view returns (string memory);
 
     function withdraw(address, uint256) external returns (bool);
+    function fund(address, uint256) external returns (bool);
 } 
