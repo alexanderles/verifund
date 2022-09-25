@@ -10,8 +10,6 @@ contract VerifundFactoryTest is Test {
     Campaign campaign1;
 
     function setUp() public {
-        factory = VerifundFactory();
-        campaign1 = Campaign();
     }
 
     function testCreateCampaign() public {
@@ -19,6 +17,6 @@ contract VerifundFactoryTest is Test {
     }
 
     function testAllCampaigns() public {
-        
+
     }
 }

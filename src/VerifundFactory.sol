@@ -8,7 +8,7 @@ contract VerifundFactory is IVerifundFactory {
 
     Campaign[] private _campaigns;
 
-    function createCampaign(string memory name, address[] memory whiteList, uint256 targetAmount) external {
+    function createCampaign(address[] memory whiteList, uint256 targetAmount) external {
         Campaign campaign = new Campaign(whiteList, targetAmount);
         _campaigns.push(campaign);
     }
