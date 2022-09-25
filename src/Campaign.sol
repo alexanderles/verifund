@@ -22,33 +22,47 @@ contract Campaign is ICampaign, Ownable {
     using SafeMath for uint;
 
     uint256 private i_targetAmount;
+    uint256 private targetAcc;
+    bool private _targetReached;
     address private immutable i_owner;
     address[] private s_whiteList;
 
     mapping(address => uint256) private amountDonated;
 
-    // event Transfer(address indexed from, address indexed to, uint value);
-    event ReceivedFunds(address indexed from, uint256 indexed amount);
+    event ReceivedFunds(address indexed from, uint256 indexed amount, uint256 indexed currentAmount);
     event FundsWithdrawn(address indexed to, uint256 indexed amount);
-    event CampaignCreated(address indexed campaign, uint256 indexed targetAmount, address[] indexed whiteList);
+    event TargetReached(uint256 total);
 
     constructor(address[] memory wl, uint256 targetAmount) public {
        i_targetAmount = targetAmount;
        s_whiteList = wl;
        i_owner = msg.sender;
-       emit CampaignCreated(address(this), i_targetAmount, s_whiteList);
     }
 
     // Function to receive Ether. msg.data must be empty
     receive() external payable {
         amountDonated[msg.sender] = amountDonated[msg.sender] + msg.value;
-        emit ReceivedFunds(msg.sender, msg.value);
+        targetAcc = targetAcc + msg.value;
+        emit ReceivedFunds(msg.sender, msg.value, targetAcc);
+        if (targetAcc >= i_targetAmount) {
+            if (! _targetReached) {
+                emit TargetReached(targetAcc);
+                _targetReached = true;
+            }
+        }
     }
 
     // Fallback function is called when msg.data is not empty
     fallback() external payable {
         amountDonated[msg.sender] = amountDonated[msg.sender] + msg.value;
-        emit ReceivedFunds(msg.sender, msg.value);
+        targetAcc = targetAcc + msg.value;
+        emit ReceivedFunds(msg.sender, msg.value, targetAcc);
+        if (targetAcc >= i_targetAmount) {
+            if (! _targetReached) {
+                emit TargetReached(targetAcc);
+                _targetReached = true;
+            }
+        }
     }
 
     function withdraw(address payable to, uint256 val) external override onlyOwner {
@@ -62,7 +76,14 @@ contract Campaign is ICampaign, Ownable {
 
     function fund() public payable override {
         amountDonated[msg.sender] = amountDonated[msg.sender] + msg.value;
-        emit ReceivedFunds(msg.sender, msg.value);
+        targetAcc = targetAcc + msg.value;
+        emit ReceivedFunds(msg.sender, msg.value, targetAcc);
+        if (targetAcc >= i_targetAmount) {
+            if (! _targetReached) {
+                emit TargetReached(targetAcc);
+                _targetReached = true;
+            }
+        }
     }
 
     function getTargetAmount() external view override returns (uint256) {

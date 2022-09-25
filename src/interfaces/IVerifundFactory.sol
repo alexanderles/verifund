@@ -5,5 +5,5 @@ import '../Campaign.sol';
 interface  IVerifundFactory {
 
     function createCampaign(address[] memory whiteList, uint256 targetAmount) external;
-    function getAllCampaigns() external view returns (Campaign[] memory);
+    function getAllCampaigns() external view returns (address[] memory);
 }
