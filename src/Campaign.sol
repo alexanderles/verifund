@@ -21,66 +21,57 @@ contract Ownable {
 contract Campaign is ICampaign, Ownable {
     using SafeMath for uint;
 
-    string private s_name;
-    uint256 private immutable i_targetAmount;
+    uint256 private i_targetAmount;
     address private immutable i_owner;
     address[] private s_whiteList;
 
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint)) public allowance;
+    mapping(address => uint256) private amountDonated;
 
-    event Transfer(address indexed from, address indexed to, uint value);
-    event CampaignCreated(address campaign, string name, uint256 targetAmount, address[] whiteList);
+    // event Transfer(address indexed from, address indexed to, uint value);
+    event ReceivedFunds(address indexed from, uint256 indexed amount);
+    event FundsWithdrawn(address indexed to, uint256 indexed amount);
+    event CampaignCreated(address indexed campaign, uint256 indexed targetAmount, address[] indexed whiteList);
 
-    constructor(address[] memory wl, uint256 targetAmount) {
+    constructor(address[] memory wl, uint256 targetAmount) public {
        i_targetAmount = targetAmount;
        s_whiteList = wl;
        i_owner = msg.sender;
-       emit CampaignCreated(address(this), s_name, i_targetAmount, s_whiteList);
-    }
-
-    function _transfer(address from, address to, uint value) internal {
-        balanceOf[from] = balanceOf[from].sub(value);
-        balanceOf[to] = balanceOf[to].add(value);
-        emit Transfer(from, to, value);
-    }
-
-    function transfer(address to, uint value) external returns (bool) {
-        _transfer(msg.sender, to, value);
-        return true;
+       emit CampaignCreated(address(this), i_targetAmount, s_whiteList);
     }
 
     // Function to receive Ether. msg.data must be empty
-    receive() external payable {}
+    receive() external payable {
+        amountDonated[msg.sender] = amountDonated[msg.sender] + msg.value;
+        emit ReceivedFunds(msg.sender, msg.value);
+    }
 
     // Fallback function is called when msg.data is not empty
     fallback() external payable {
-        fund(msg.sender, msg.value);
+        amountDonated[msg.sender] = amountDonated[msg.sender] + msg.value;
+        emit ReceivedFunds(msg.sender, msg.value);
     }
 
-    function withdraw(address to, uint256 val) external onlyOwner returns (bool) {
+    function withdraw(address payable to, uint256 val) external override onlyOwner {
         for (uint i=0; i < s_whiteList.length; i++) {
-            if (to == s_whiteList[i]) {
-                _transfer(address(this), to, val);
-                break;
+            if (to == s_whiteList[i] && address(this).balance > val) {
+                to.transfer(val);
+                emit FundsWithdrawn(to, val);
             }
         }
     }
 
-    function fund(address from, uint256 val) public returns (bool) {
-        _transfer(from, address(this), val);
+    function fund() public payable override {
+        amountDonated[msg.sender] = amountDonated[msg.sender] + msg.value;
+        emit ReceivedFunds(msg.sender, msg.value);
     }
 
-    function getTargetAmount() external view returns (uint256) {
+    function getTargetAmount() external view override returns (uint256) {
         return i_targetAmount;
     }
-    function getBalance() external view returns (uint256) {
+    function getBalance() external view override returns (uint256) {
         return address(this).balance;
     }
-    function getWhiteList() external view returns (address[] memory) {
+    function getWhiteList() external view override returns (address[] memory) {
         return s_whiteList;
-    }
-    function getName() external view returns (string memory) {
-        return s_name;
-    }   
+    } 
 }
