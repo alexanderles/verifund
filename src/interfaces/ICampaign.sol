@@ -2,7 +2,6 @@
 pragma solidity ^0.8.7;
 
 interface ICampaign {
-    function approve(address spender, uint value) external returns (bool);
     function transfer(address to, uint value) external returns (bool);
 
     function getTargetAmount() external view returns (uint256);

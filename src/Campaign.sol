@@ -29,7 +29,6 @@ contract Campaign is ICampaign, Ownable {
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint)) public allowance;
 
-    event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
     event CampaignCreated(address campaign, string name, uint256 targetAmount, address[] whiteList);
 
@@ -56,7 +55,7 @@ contract Campaign is ICampaign, Ownable {
 
     // Fallback function is called when msg.data is not empty
     fallback() external payable {
-
+        fund(msg.sender, msg.value);
     }
 
     function withdraw(address to, uint256 val) external onlyOwner returns (bool) {
@@ -68,8 +67,8 @@ contract Campaign is ICampaign, Ownable {
         }
     }
 
-    function fund(address from, uint256 val) returns (bool) {
-        
+    function fund(address from, uint256 val) public returns (bool) {
+        _transfer(from, address(this), val);
     }
 
     function getTargetAmount() external view returns (uint256) {
