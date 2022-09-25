@@ -6,14 +6,17 @@ import './Campaign.sol';
 
 contract VerifundFactory is IVerifundFactory {
 
-    Campaign[] private _campaigns;
+    address[] private _campaigns;
+    event CampaignCreated(address indexed c, address[] whiteList, uint256 indexed targetAmount);
 
     function createCampaign(address[] memory whiteList, uint256 targetAmount) external override {
-        Campaign campaign = new Campaign(whiteList, targetAmount);
+        
+        address campaign = address(new Campaign(whiteList, targetAmount));
         _campaigns.push(campaign);
+        emit CampaignCreated(campaign, whiteList, targetAmount);
     }
 
-    function getAllCampaigns() external view override returns (Campaign[] memory) {
+    function getAllCampaigns() external view override returns (address[] memory) {
         return _campaigns;
     }
 }
