@@ -8,12 +8,12 @@ contract VerifundFactory is IVerifundFactory {
 
     Campaign[] private _campaigns;
 
-    function createCampaign(string memory name, address[] memory whiteList, uint256 targetAmount) external {
+    function createCampaign(address[] memory whiteList, uint256 targetAmount) external override {
         Campaign campaign = new Campaign(whiteList, targetAmount);
         _campaigns.push(campaign);
     }
 
-    function getAllCampaigns() external view returns (Campaign[] memory) {
+    function getAllCampaigns() external view override returns (Campaign[] memory) {
         return _campaigns;
     }
 }
