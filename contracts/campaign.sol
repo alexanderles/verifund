@@ -31,12 +31,14 @@ contract Campaign is ICampaign, Ownable {
 
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
+    event CampaignCreated(address campaign, string name, uint256 targetAmount, address[] whiteList);
 
     constructor(string memory n, address[] memory wl, uint256 targetAmount) {
        s_name = n;
        i_targetAmount = targetAmount;
        s_whiteList = wl;
        i_owner = msg.sender;
+       emit CampaignCreated(address(this), s_name, i_targetAmount, s_whiteList);
     }
 
      function _approve(address ow, address spender, uint value) private {
